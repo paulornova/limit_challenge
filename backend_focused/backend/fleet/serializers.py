@@ -180,3 +180,7 @@ class VehicleNeedingMaintenanceSerializer(VehicleSerializer):
 
     class Meta(VehicleSerializer.Meta):
         fields = [*VehicleSerializer.Meta.fields, "last_maintenance"]
+
+
+class VehicleReassignmentSerializer(serializers.Serializer):
+    office = serializers.PrimaryKeyRelatedField(queryset=Office.objects.all())

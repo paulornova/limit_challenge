@@ -22,6 +22,7 @@ from .serializers import (
     VehicleSerializer,
     VehicleDetailSerializer,
     VehicleNeedingMaintenanceSerializer,
+    VehicleReassignmentSerializer,
 )
 
 
@@ -54,6 +55,16 @@ def parse_optional_boolean(query_params, key):
     if normalized in {"false", "0"}:
         return False
     raise serializers.ValidationError({key: "Enter a valid boolean."})
+
+
+def canonicalize_required_query_parameter(query_params, key):
+    value = query_params.get(key)
+    if value is None:
+        raise serializers.ValidationError({key: "This query parameter is required."})
+    normalized = value.strip().upper()
+    if not normalized:
+        raise serializers.ValidationError({key: "This query parameter cannot be blank."})
+    return normalized
 
 
 class ProtectedDeleteModelViewSet(viewsets.ModelViewSet):
@@ -180,6 +191,28 @@ class VehicleViewSet(ProtectedDeleteModelViewSet):
             "mechanic"
         ).order_by("-maintenance_date", "-id")
         return Response(MaintenanceHistorySerializer(queryset, many=True).data)
+
+    @action(detail=True, methods=["patch"], url_path="reassign")
+    def reassign(self, request, *args, **kwargs):
+        vehicle = self.get_object()
+        serializer = VehicleReassignmentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        vehicle.office = serializer.validated_data["office"]
+        vehicle.save(update_fields=["office"])
+        return Response(VehicleSerializer(vehicle).data)
+
+    @action(detail=False, methods=["get"], url_path="duplicate-check")
+    def duplicate_check(self, request):
+        vin = canonicalize_required_query_parameter(request.query_params, "vin")
+        license_plate = canonicalize_required_query_parameter(
+            request.query_params, "license_plate"
+        )
+        conflicts = []
+        if Vehicle.objects.filter(vin=vin).exists():
+            conflicts.append("vin")
+        if Vehicle.objects.filter(license_plate=license_plate, active=True).exists():
+            conflicts.append("license_plate")
+        return Response({"conflicts": conflicts})
 
     @action(detail=False, methods=["get"], url_path="needing-maintenance")
     def needing_maintenance(self, request):
