@@ -28,12 +28,12 @@ export default function VehicleCreatePageContent() {
   const officesQuery = useQuery({ queryKey: ['offices'], queryFn: fetchOffices });
   const createMutation = useMutation({
     mutationFn: createVehicle,
-    onSuccess: async () => {
+    onSuccess: async (vehicle) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['vehicles'] }),
         queryClient.invalidateQueries({ queryKey: ['maintenance-due'] }),
       ]);
-      router.push('/vehicles?notice=created');
+      router.push(`/vehicles/${vehicle.id}`);
     },
     onError: (error) => {
       const result = getApiValidationErrors(error, vehicleFields);

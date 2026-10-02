@@ -5,7 +5,7 @@ import { Alert, Box, Button, Paper, Skeleton, Stack, Typography } from '@mui/mat
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getApiErrorMessage, getApiStatus, getApiValidationErrors } from '@/lib/api-client';
-import { fetchOffices, fetchVehicle, updateVehicle, type VehiclePayload } from '@/lib/vehicles';
+import { fetchVehicle, updateVehicle, type VehiclePayload } from '@/lib/vehicles';
 import VehicleForm, { type VehicleFormValues } from './VehicleForm';
 
 interface VehicleEditPageContentProps {
@@ -33,7 +33,6 @@ export default function VehicleEditPageContent({ vehicleId }: VehicleEditPageCon
     queryKey: ['vehicle', vehicleId],
     queryFn: () => fetchVehicle(vehicleId),
   });
-  const officesQuery = useQuery({ queryKey: ['offices'], queryFn: fetchOffices });
   const updateMutation = useMutation({
     mutationFn: (payload: VehiclePayload) => updateVehicle(vehicleId, payload),
     onSuccess: async () => {
@@ -42,7 +41,7 @@ export default function VehicleEditPageContent({ vehicleId }: VehicleEditPageCon
         queryClient.invalidateQueries({ queryKey: ['vehicle', vehicleId] }),
         queryClient.invalidateQueries({ queryKey: ['maintenance-due'] }),
       ]);
-      router.push('/vehicles?notice=updated');
+      router.push(`/vehicles/${vehicleId}`);
     },
     onError: (error) => {
       const result = getApiValidationErrors(error, vehicleFields);
@@ -102,17 +101,20 @@ export default function VehicleEditPageContent({ vehicleId }: VehicleEditPageCon
           Edit vehicle
         </Typography>
         <Typography color="text.secondary">
-          Update {vehicle.license_plate} without changing the fleet search experience.
+          Update vehicle attributes. Office changes use the reassignment action on the vehicle
+          detail page.
+        </Typography>
+        <Typography color="text.secondary" sx={{ mt: 1 }} variant="body2">
+          Current office: {vehicle.office.name} - {vehicle.office.city}
         </Typography>
       </Box>
       <VehicleForm
         generalError={generalError}
         initialValues={initialValues}
-        isLoadingOffices={officesQuery.isPending}
+        isLoadingOffices={false}
         isSaving={updateMutation.isPending}
-        offices={officesQuery.data}
-        officesError={officesQuery.isError ? getApiErrorMessage(officesQuery.error) : undefined}
-        onCancel={() => router.push('/vehicles')}
+        showOfficeField={false}
+        onCancel={() => router.push(`/vehicles/${vehicleId}`)}
         onSubmit={handleSubmit}
         serverErrors={serverErrors}
         submitLabel="Save changes"

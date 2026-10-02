@@ -177,6 +177,11 @@ export async function updateVehicle(id: number, payload: VehiclePayload) {
   return response.data;
 }
 
+export async function reassignVehicle(id: number, office: number) {
+  const response = await apiClient.patch<Vehicle>(`/vehicles/${id}/reassign/`, { office });
+  return response.data;
+}
+
 export async function deleteVehicle(id: number) {
   await apiClient.delete(`/vehicles/${id}/`);
 }

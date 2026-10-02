@@ -50,6 +50,7 @@ interface VehicleFormProps {
   serverErrors?: FormErrors;
   onCancel: () => void;
   onSubmit: (payload: VehiclePayload) => void;
+  showOfficeField?: boolean;
 }
 
 const labels: Record<Exclude<FormField, 'active'>, string> = {
@@ -72,6 +73,7 @@ export default function VehicleForm({
   serverErrors,
   onCancel,
   onSubmit,
+  showOfficeField = true,
 }: VehicleFormProps) {
   const [values, setValues] = useState(initialValues);
   const [clientErrors, setClientErrors] = useState<FormErrors>({});
@@ -98,7 +100,7 @@ export default function VehicleForm({
     } else if (!Number.isInteger(Number(values.year))) {
       errors.year = 'Year must be a whole number.';
     }
-    if (!values.office) {
+    if (showOfficeField && !values.office) {
       errors.office = 'Select an office.';
     }
     return errors;
@@ -163,14 +165,14 @@ export default function VehicleForm({
             type="number"
             value={values.year}
           />
-          {isLoadingOffices ? (
+          {showOfficeField && isLoadingOffices ? (
             <Box>
               <Typography color="text.secondary" variant="body2">
                 Loading offices
               </Typography>
               <Skeleton height={56} />
             </Box>
-          ) : (
+          ) : showOfficeField ? (
             <TextField
               disabled={Boolean(officesError) || isSaving}
               error={Boolean(fieldError('office'))}
@@ -190,7 +192,7 @@ export default function VehicleForm({
                 </MenuItem>
               ))}
             </TextField>
-          )}
+          ) : null}
         </Box>
 
         <FormControlLabel
@@ -203,7 +205,7 @@ export default function VehicleForm({
             Cancel
           </Button>
           <Button
-            disabled={isSaving || isLoadingOffices || Boolean(officesError)}
+            disabled={isSaving || (showOfficeField && (isLoadingOffices || Boolean(officesError)))}
             type="submit"
             variant="contained"
           >

@@ -1,11 +1,23 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Box, Button, Chip, Paper, Skeleton, Stack, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Paper,
+  Skeleton,
+  Snackbar,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { getApiErrorMessage, getApiStatus } from '@/lib/api-client';
 import { fetchVehicle } from '@/lib/vehicles';
 import MaintenanceHistoryTable from './MaintenanceHistoryTable';
+import ReassignOfficeDialog from './ReassignOfficeDialog';
 
 interface VehicleDetailPageContentProps {
   vehicleId: number;
@@ -21,6 +33,8 @@ const vehicleFields = [
 
 export default function VehicleDetailPageContent({ vehicleId }: VehicleDetailPageContentProps) {
   const router = useRouter();
+  const [reassignOpen, setReassignOpen] = useState(false);
+  const [reassignSucceeded, setReassignSucceeded] = useState(false);
   const vehicleQuery = useQuery({
     queryKey: ['vehicle', vehicleId],
     queryFn: () => fetchVehicle(vehicleId),
@@ -82,6 +96,9 @@ export default function VehicleDetailPageContent({ vehicleId }: VehicleDetailPag
           <Button onClick={() => router.push('/vehicles')} variant="outlined">
             Back to vehicles
           </Button>
+          <Button onClick={() => setReassignOpen(true)} variant="outlined">
+            Reassign office
+          </Button>
           <Button onClick={() => router.push(`/vehicles/${vehicle.id}/edit`)} variant="contained">
             Edit
           </Button>
@@ -136,6 +153,28 @@ export default function VehicleDetailPageContent({ vehicleId }: VehicleDetailPag
         </Typography>
         <MaintenanceHistoryTable records={vehicle.maintenance_records} />
       </Box>
+
+      {reassignOpen && (
+        <ReassignOfficeDialog
+          currentOffice={vehicle.office}
+          onClose={() => setReassignOpen(false)}
+          onSuccess={() => {
+            setReassignOpen(false);
+            setReassignSucceeded(true);
+          }}
+          open={reassignOpen}
+          vehicleId={vehicle.id}
+        />
+      )}
+      <Snackbar
+        autoHideDuration={5_000}
+        onClose={() => setReassignSucceeded(false)}
+        open={reassignSucceeded}
+      >
+        <Alert onClose={() => setReassignSucceeded(false)} severity="success" variant="filled">
+          Vehicle reassigned.
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
