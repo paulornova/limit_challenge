@@ -22,14 +22,14 @@ export default function AppShell({ children }: PropsWithChildren) {
             <Image alt="Fleemit" height={36} priority src="/logo.png" width={144} />
           </Box>
           <Box display="flex" gap={0.5}>
-            <Link href="/vehicles" style={{ color: 'inherit', textDecoration: 'none' }}>
-              <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
-                Vehicles
-              </Button>
-            </Link>
             <Link href="/offices" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
                 Offices
+              </Button>
+            </Link>
+            <Link href="/vehicles" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
+                Vehicles
               </Button>
             </Link>
             <Link href="/maintenance-due" style={{ color: 'inherit', textDecoration: 'none' }}>

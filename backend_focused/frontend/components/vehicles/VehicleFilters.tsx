@@ -1,8 +1,9 @@
 'use client';
 
 import { Alert, Box, Button, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { emptyVehicleFilters, type VehicleFilterValues } from '@/lib/vehicles';
+import { emptyVehicleFilters, fetchOffices, type VehicleFilterValues } from '@/lib/vehicles';
 
 interface VehicleFiltersProps {
   initialValues: VehicleFilterValues;
@@ -11,7 +12,7 @@ interface VehicleFiltersProps {
 }
 
 const fieldLabels: Record<keyof VehicleFilterValues, string> = {
-  office: 'Office ID',
+  office: 'Office',
   active: 'Status',
   make: 'Make',
   model: 'Model',
@@ -23,6 +24,7 @@ const fieldLabels: Record<keyof VehicleFilterValues, string> = {
 export default function VehicleFilters({ initialValues, onApply, onClear }: VehicleFiltersProps) {
   const [values, setValues] = useState(initialValues);
   const [dateRangeError, setDateRangeError] = useState<string>();
+  const officesQuery = useQuery({ queryKey: ['offices'], queryFn: fetchOffices });
 
   function updateField(event: ChangeEvent<HTMLInputElement>) {
     const key = event.target.name as keyof VehicleFilterValues;
@@ -75,13 +77,19 @@ export default function VehicleFilters({ initialValues, onApply, onClear }: Vehi
         >
           <TextField
             fullWidth
-            inputProps={{ min: 1 }}
             label={fieldLabels.office}
             name="office"
             onChange={updateField}
-            type="number"
+            select
             value={values.office}
-          />
+          >
+            <MenuItem value="">All offices</MenuItem>
+            {officesQuery.data?.map((office) => (
+              <MenuItem key={office.id} value={String(office.id)}>
+                {office.name} {'\u00b7'} {office.city}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             fullWidth
             label={fieldLabels.active}

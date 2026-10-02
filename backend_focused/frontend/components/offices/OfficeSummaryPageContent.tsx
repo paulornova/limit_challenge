@@ -63,10 +63,26 @@ function OfficeSummaryTable({ offices }: { offices: OfficeSummary[] }) {
         <TableBody>
           {offices.map((office) => (
             <TableRow hover key={office.id}>
-              <TableCell>{office.name}</TableCell>
+              <TableCell>
+                <Link
+                  href={`/offices/${office.id}`}
+                  style={{
+                    color: 'inherit',
+                    fontWeight: 600,
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                  }}
+                >
+                  {office.name}
+                </Link>
+              </TableCell>
               <TableCell>{office.city}</TableCell>
               <TableCell align="right">
-                <Button component={Link} href={`/vehicles?office=${office.id}`} size="small">
+                <Button
+                  component={Link}
+                  href={`/vehicles?office=${office.id}&active=true`}
+                  size="small"
+                >
                   {office.active_vehicle_count}
                 </Button>
               </TableCell>
@@ -102,6 +118,7 @@ export default function OfficeSummaryPageContent() {
   const officeSummaryQuery = useQuery({
     queryKey: ['office-summary'],
     queryFn: fetchOfficeSummary,
+    staleTime: 30_000,
   });
 
   if (officeSummaryQuery.isPending) {
