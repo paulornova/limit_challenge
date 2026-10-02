@@ -106,3 +106,77 @@ class MaintenanceRecordSerializer(serializers.ModelSerializer):
         if value > date.today():
             raise serializers.ValidationError("Maintenance date cannot be in the future.")
         return value
+
+
+class OfficeReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Office
+        fields = ["id", "name", "city"]
+
+
+class MechanicReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mechanic
+        fields = ["id", "name", "certification_number", "active"]
+
+
+class MaintenanceHistorySerializer(serializers.ModelSerializer):
+    mechanic = MechanicReadSerializer(read_only=True)
+
+    class Meta:
+        model = MaintenanceRecord
+        fields = [
+            "id",
+            "maintenance_date",
+            "maintenance_type",
+            "cost",
+            "notes",
+            "mechanic",
+        ]
+
+
+class VehicleDetailSerializer(serializers.ModelSerializer):
+    office = OfficeReadSerializer(read_only=True)
+    maintenance_records = MaintenanceHistorySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Vehicle
+        fields = [
+            "id",
+            "vin",
+            "license_plate",
+            "make",
+            "model",
+            "year",
+            "office",
+            "active",
+            "maintenance_records",
+        ]
+
+
+class OfficeSummarySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    city = serializers.CharField()
+    active_vehicle_count = serializers.IntegerField()
+    maintenance_cost_last_year = serializers.DecimalField(
+        max_digits=12, decimal_places=2, coerce_to_string=False
+    )
+    last_maintenance = serializers.DateField(allow_null=True)
+
+
+class MechanicWorkloadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    certification_number = serializers.CharField()
+    maintenance_count_current_year = serializers.IntegerField()
+    maintenance_cost_current_year = serializers.DecimalField(
+        max_digits=12, decimal_places=2, coerce_to_string=False
+    )
+
+
+class VehicleNeedingMaintenanceSerializer(VehicleSerializer):
+    last_maintenance = serializers.DateField(read_only=True, allow_null=True)
+
+    class Meta(VehicleSerializer.Meta):
+        fields = [*VehicleSerializer.Meta.fields, "last_maintenance"]
