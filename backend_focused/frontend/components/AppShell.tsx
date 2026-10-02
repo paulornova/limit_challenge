@@ -32,6 +32,11 @@ export default function AppShell({ children }: PropsWithChildren) {
                 Vehicles
               </Button>
             </Link>
+            <Link href="/mechanics" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
+                Mechanics
+              </Button>
+            </Link>
             <Link href="/maintenance-due" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
                 Maintenance Due
