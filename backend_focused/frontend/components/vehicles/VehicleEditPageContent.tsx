@@ -40,6 +40,7 @@ export default function VehicleEditPageContent({ vehicleId }: VehicleEditPageCon
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['vehicles'] }),
         queryClient.invalidateQueries({ queryKey: ['vehicle', vehicleId] }),
+        queryClient.invalidateQueries({ queryKey: ['maintenance-due'] }),
       ]);
       router.push('/vehicles?notice=updated');
     },

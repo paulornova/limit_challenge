@@ -41,7 +41,10 @@ export default function VehiclesPageContent() {
   const deleteMutation = useMutation({
     mutationFn: deleteVehicle,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['vehicles'] }),
+        queryClient.invalidateQueries({ queryKey: ['maintenance-due'] }),
+      ]);
       setVehicleToDelete(null);
       setDeleteError(undefined);
       setDeleteSucceeded(true);

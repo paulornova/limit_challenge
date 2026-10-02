@@ -21,11 +21,18 @@ export default function AppShell({ children }: PropsWithChildren) {
           <Box sx={{ flexGrow: 1, lineHeight: 0 }}>
             <Image alt="Fleemit" height={36} priority src="/logo.png" width={144} />
           </Box>
-          <Link href="/vehicles" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
-              Vehicles
-            </Button>
-          </Link>
+          <Box display="flex" gap={0.5}>
+            <Link href="/vehicles" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
+                Vehicles
+              </Button>
+            </Link>
+            <Link href="/maintenance-due" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
+                Maintenance Due
+              </Button>
+            </Link>
+          </Box>
         </Toolbar>
       </AppBar>
       <Container component="main" maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>

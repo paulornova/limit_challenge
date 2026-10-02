@@ -38,6 +38,10 @@ export interface VehicleDetail extends Omit<Vehicle, 'office'> {
   maintenance_records: MaintenanceRecord[];
 }
 
+export interface MaintenanceDueVehicle extends Vehicle {
+  last_maintenance: string | null;
+}
+
 export interface VehiclePayload {
   vin: string;
   license_plate: string;
@@ -141,6 +145,11 @@ export async function fetchVehicles(params: VehicleSearchParams) {
 
 export async function fetchVehicle(id: number) {
   const response = await apiClient.get<VehicleDetail>(`/vehicles/${id}/`);
+  return response.data;
+}
+
+export async function fetchMaintenanceDueVehicles() {
+  const response = await apiClient.get<MaintenanceDueVehicle[]>('/vehicles/needing-maintenance/');
   return response.data;
 }
 
