@@ -1,205 +1,105 @@
-# Fleet Maintenance API Take-home Challenge
+# Fleet Maintenance API
 
-Build a REST API for managing a fleet of vehicles and their maintenance history.
+A Django + Django REST Framework backend for tracking offices, vehicles, mechanics, and vehicle maintenance. The implementation uses one `fleet` app and SQLite for simple reviewer setup.
 
-Use Python, Django and Django REST Framework.
+## Setup
 
-The API does not need authentication or a frontend.
-
-## Domain
-
-A company owns vehicles that are assigned to offices around the country.
-Vehicles periodically receive maintenance services performed by mechanics.
-A vehicle may have many maintenance records.
-A mechanic may service many vehicles.
-Each office has many vehicles.
-
-Offices
-
-An office has:
-* name
-* city
-
-Vehicles
-
-A vehicle has:
-* VIN (Vehicle Identification Number)
-* license plate
-* make
-* model
-* year
-* office
-* active flag
-
-A VIN must uniquely identify a vehicle.
-A license plate cannot be shared by two active vehicles.
-
-Provide CRUD endpoints.
-
-A mechanic has:
-
-name
-certification number
-active flag
-
-Provide CRUD endpoints.
-
-Maintenance Records
-
-A maintenance record contains:
-
-vehicle
-mechanic
-maintenance date
-maintenance type
-cost
-notes
-
-Provide CRUD endpoints.
-
-## API endpoints
-
-1. CRUD endpoints for offices, vehicles, mechanics and maintenance records.
-
-2. Office summary
-
-It should return every office together with:
-* number of active vehicles
-* total maintenance cost during the last 12 months
-* date of the most recent maintenance performed on any vehicle in that office
-
-Example:
-[
-    {
-        "name": "New York",
-        "city": "New York",
-        "active_vehicle_count": 42,
-        "maintenance_cost_last_year": 81250.50,
-        "last_maintenance": "2025-02-18"
-    }
-]
-
-3. Vehicle search
-
-It should support optional filtering by any combination of:
-
-* office
-* active/inactive
-* make
-* model
-* maintenance performed between two dates
-* mechanic certification number
-
-4. Vehicle details
-
-Return vehicle details together with:
-* office information
-* complete maintenance history
-* mechanic information for each maintenance record
-
-The endpoint should perform well when a vehicle has hundreds of maintenance records.
-
-5. Vehicle maintenance history
-
-Provide an endpoint that returns the maintenance history for a single vehicle ordered from newest to oldest.
-
-6. Assign vehicle
-
-Provide an endpoint that moves a vehicle from one office to another.
-
-The endpoint should record only the new office assignment.
-
-7. Mechanic workload
-
-It should return:
-* mechanic name
-* number of maintenance records completed during the current year
-* total maintenance cost of work performed during the current year
-
-Order mechanics from busiest to least busy.
-
-8. Vehicles needing maintenance
-
-It should return all active vehicles that satisfy either of the following:
-* have never received maintenance
-* last maintenance was more than 365 days ago
-
-Order by oldest maintenance first.
-
-9. Duplicate vehicle check
-
-Given VIN and license plate, it should return whether another conflicting vehicle already exists and identifies the conflicting fields.
-
-Example:
-
-{
-    "conflicts": [
-        "vin",
-        "license_plate"
-    ]
-}
-
-## Front-end
-
-If you know React, implement a front-end that uses the CRUD endpoints, the vehicle search one 
-and another endpoint you choose.
-
-The Next.js 16 + React 19 app in `frontend/` is pre-wired for this challenge. Material UI handles
-layout, axios powers HTTP requests, and `@tanstack/react-query` is ready for data fetching. 
-
-## Error Handling
-
-Return appropriate HTTP status codes for invalid requests.
-Validation errors should include meaningful messages.
-
-## Project Structure
-
-- `backend/`: Empty Django project.
-- `frontend/`: Empty Next.js app.
-
-## Getting Started
-
-### Backend
+From the repository root:
 
 ```bash
-cd backend
-python -m venv .venv && source .venv/bin/activate
+cd backend_focused/backend
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8000
 ```
 
-### Frontend
+In Git Bash on Windows, activate the environment with:
 
 ```bash
-cd frontend
-npm install
-# NEXT_PUBLIC_API_BASE_URL defaults to http://localhost:8000/api
-npm run dev
+source .venv/Scripts/activate
 ```
 
-Visit `http://localhost:3000` in your web browser to run it.
+The API is available at `http://localhost:8000/api/`.
 
-## Deliverables
+## Tests
 
-source code
-database migrations
-a Django management command that fills the database with dummy data to make manually testing your app easier (suggestion: use the faker Python library)
-README describing:
-  how to run the project
-  how to run tests
-  assumptions made
-  chosen tradeoffs  
-if front-end was implemented, record and share a brief video (max 2 minutes) demonstrating the frontend working end-to-end with the backend.
+```bash
+cd backend_focused/backend
+python manage.py test
+python manage.py makemigrations --check
+```
 
-## Evaluation Criteria
+## Seed data
 
-- **Backend (50%)** – API design, database queries performance, appropriate use of Django and Django Rest Framework
-- **Frontend (25%)** – UX clarity, filter UX tied to query params, state/data management, handling
-  of loading/empty/error cases, and overall polish.
-- **Code Quality (15%)** – Code structure, testing where it adds value, documentation/readability, naming
-- **Product Thinking (10%)** – Workflow clarity, assumptions noted, and thoughtful UX details (if front-end is implemented)
+Create a small dataset with the defaults (5 offices, 100 vehicles, 20 mechanics, 500 maintenance records):
 
-## Optional Bonus
+```bash
+python manage.py seed_fleet_data --seed 42
+```
 
-Authentication using JWT is not required but welcome if time allows.
+The command refuses to overwrite existing fleet data. Use `--clear` to explicitly replace it:
+
+```bash
+python manage.py seed_fleet_data --clear --seed 42 --offices 5 --vehicles 100 --mechanics 20 --maintenance-records 750
+```
+
+For query exploration, a practical larger profile is:
+
+```bash
+python manage.py seed_fleet_data --clear --seed 42 --offices 25 --vehicles 5000 --mechanics 150 --maintenance-records 50000
+```
+
+`--seed` makes generated values reasonably reproducible. The command creates inactive historical plate sharing, no-history vehicles, old and recent maintenance, and—with 1,000 or more records—at least one vehicle with 500 maintenance records.
+
+## API routes
+
+Standard CRUD is available for all resources:
+
+| Resource | Routes |
+| --- | --- |
+| Offices | `GET, POST /api/offices/`; `GET, PUT, PATCH, DELETE /api/offices/{id}/` |
+| Vehicles | `GET, POST /api/vehicles/`; `GET, PUT, PATCH, DELETE /api/vehicles/{id}/` |
+| Mechanics | `GET, POST /api/mechanics/`; `GET, PUT, PATCH, DELETE /api/mechanics/{id}/` |
+| Maintenance records | `GET, POST /api/maintenance-records/`; `GET, PUT, PATCH, DELETE /api/maintenance-records/{id}/` |
+
+Custom endpoints:
+
+- `GET /api/offices/summary/`
+- `GET /api/vehicles/{id}/maintenance-history/`
+- `PATCH /api/vehicles/{id}/reassign/` with `{ "office": 123 }`
+- `GET /api/mechanics/workload/`
+- `GET /api/vehicles/needing-maintenance/`
+- `GET /api/vehicles/duplicate-check/?vin=...&license_plate=...`
+
+`GET /api/vehicles/` is also the vehicle search endpoint. It accepts any combination of `office`, `active`, `make`, `model`, `maintenance_date_from`, `maintenance_date_to`, and `mechanic_certification_number`.
+
+Example:
+
+```text
+/api/vehicles/?active=true&maintenance_date_from=2026-01-01&mechanic_certification_number=CERT-42
+```
+
+## Assumptions and rules
+
+- Mechanics are not assigned to offices.
+- Reassignment updates only the vehicle's current office; there is no assignment history.
+- VIN is globally unique. VINs and license plates are trimmed and uppercased before persistence.
+- A plate is unique only among active vehicles. Inactive vehicles may share historical plates, including with an active vehicle.
+- Duplicate check is advisory and assumes a new active vehicle candidate; database constraints remain authoritative.
+- Maintenance dates cannot be in the future; today is valid.
+- Costs use fixed-precision decimals and cannot be negative.
+- Referenced offices, vehicles, and mechanics use protected deletion and return `409 Conflict` through the API.
+
+## Performance decisions
+
+Reports use database aggregation rather than Python-side loops. Vehicle search uses a correlated `Exists` subquery so date and mechanic filters apply to the same maintenance record without duplicate vehicle rows. Vehicle detail uses `select_related` for its office and a prefetched, `select_related` maintenance history for mechanics, keeping it at a small constant query count even with hundreds of records.
+
+Indexes target the documented access patterns, and focused tests assert query counts for detail, summaries, workload, and maintenance-due results. A 50,000-record local seed profile was used for diagnostic checks; timings are local observations, not benchmark guarantees.
+
+## Trade-offs and production evolution
+
+SQLite is retained because it is supplied and keeps reviewer setup simple. PostgreSQL would be the likely production database for stronger concurrent-write behavior and operational tooling.
+
+The take-home intentionally omits authentication, caching, Redis, Celery, generic idempotency infrastructure, assignment history, and deployment tooling. Custom report/history results follow the challenge semantics; a production API may paginate large responses where appropriate.

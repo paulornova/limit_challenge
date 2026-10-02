@@ -112,7 +112,6 @@ class Command(BaseCommand):
     def _create_vehicles(count, offices, random_generator, seed):
         vehicles = []
         active_plates = []
-        inactive_plates = []
         makes_and_models = [
             ("Ford", "Transit"),
             ("Toyota", "Corolla"),
@@ -127,15 +126,11 @@ class Command(BaseCommand):
             active = index % 5 != 0
             if not active and active_plates:
                 license_plate = active_plates[index % len(active_plates)]
-            elif not active and inactive_plates and index % 10 == 0:
-                license_plate = inactive_plates[0]
             else:
                 license_plate = f"PL{seed % 100000:05d}{index:05d}"
 
             if active:
                 active_plates.append(license_plate)
-            else:
-                inactive_plates.append(license_plate)
             make, model = makes_and_models[index % len(makes_and_models)]
             vehicles.append(
                 Vehicle(
