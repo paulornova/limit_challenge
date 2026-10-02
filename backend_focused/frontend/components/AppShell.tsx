@@ -1,17 +1,30 @@
-import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, Toolbar } from '@mui/material';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { PropsWithChildren } from 'react';
 
 export default function AppShell({ children }: PropsWithChildren) {
   return (
     <Box minHeight="100vh">
-      <AppBar position="sticky" elevation={0}>
+      <AppBar
+        color="transparent"
+        elevation={0}
+        position="sticky"
+        sx={{
+          bgcolor: '#fefefe',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          color: '#054231',
+        }}
+      >
         <Toolbar>
-          <Typography component="span" variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
-            Fleemit
-          </Typography>
+          <Box sx={{ flexGrow: 1, lineHeight: 0 }}>
+            <Image alt="Fleemit" height={36} priority src="/logo.png" width={144} />
+          </Box>
           <Link href="/vehicles" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Button color="inherit">Vehicles</Button>
+            <Button color="inherit" sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
+              Vehicles
+            </Button>
           </Link>
         </Toolbar>
       </AppBar>

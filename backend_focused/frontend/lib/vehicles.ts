@@ -17,8 +17,25 @@ export interface Office {
   city: string;
 }
 
+export interface Mechanic {
+  id: number;
+  name: string;
+  certification_number: string;
+  active: boolean;
+}
+
+export interface MaintenanceRecord {
+  id: number;
+  maintenance_date: string;
+  maintenance_type: string;
+  cost: string | number;
+  notes: string;
+  mechanic: Mechanic;
+}
+
 export interface VehicleDetail extends Omit<Vehicle, 'office'> {
   office: Office;
+  maintenance_records: MaintenanceRecord[];
 }
 
 export interface VehiclePayload {

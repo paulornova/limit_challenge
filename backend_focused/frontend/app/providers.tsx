@@ -11,10 +11,11 @@ function useTheme() {
       createTheme({
         palette: {
           primary: {
-            main: '#0f62fe',
+            main: '#054231',
           },
           background: {
-            default: '#f5f7fb',
+            default: '#fefefe',
+            paper: '#fefefe',
           },
         },
         shape: { borderRadius: 8 },

@@ -145,6 +145,7 @@ export default function VehiclesPageContent() {
           isInitialLoading={vehiclesQuery.isPending}
           isRefreshing={vehiclesQuery.isFetching && !vehiclesQuery.isPending}
           onDelete={openDeleteDialog}
+          onDetails={(vehicle) => router.push(`/vehicles/${vehicle.id}`)}
           onEdit={(vehicle) => router.push(`/vehicles/${vehicle.id}/edit`)}
           vehicles={data?.results ?? []}
         />

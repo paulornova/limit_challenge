@@ -22,6 +22,7 @@ interface VehicleTableProps {
   isInitialLoading: boolean;
   isRefreshing: boolean;
   onDelete: (vehicle: Vehicle) => void;
+  onDetails: (vehicle: Vehicle) => void;
   onEdit: (vehicle: Vehicle) => void;
 }
 
@@ -44,6 +45,7 @@ export default function VehicleTable({
   isInitialLoading,
   isRefreshing,
   onDelete,
+  onDetails,
   onEdit,
 }: VehicleTableProps) {
   return (
@@ -85,6 +87,11 @@ export default function VehicleTable({
                     />
                   </TableCell>
                   <TableCell>
+                    <Tooltip title={`View ${vehicle.license_plate} details`}>
+                      <Button onClick={() => onDetails(vehicle)} size="small">
+                        Details
+                      </Button>
+                    </Tooltip>
                     <Tooltip title={`Edit ${vehicle.license_plate}`}>
                       <Button onClick={() => onEdit(vehicle)} size="small">
                         Edit
