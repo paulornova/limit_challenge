@@ -4,6 +4,7 @@ const config = {
   trailingComma: 'all',
   printWidth: 100,
   semi: true,
+  endOfLine: 'auto',
 };
 
 export default config;

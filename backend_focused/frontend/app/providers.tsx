@@ -1,6 +1,7 @@
 'use client';
 
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import { PropsWithChildren, useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -24,14 +25,27 @@ function useTheme() {
 
 export default function Providers({ children }: PropsWithChildren) {
   const theme = useTheme();
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 30_000,
+            retry: 1,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+  );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AppRouterCacheProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AppRouterCacheProvider>
   );
 }

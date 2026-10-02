@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import AppShell from '@/components/AppShell';
 import Providers from './providers';
 import './globals.css';
 
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Fleet Tracker Challenge',
-  description: 'Frontend scaffold for the take-home assignment',
+  title: 'Fleet Tracker',
+  description: 'Vehicle search for the fleet maintenance challenge',
 };
 
 export default function RootLayout({
@@ -25,8 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <Providers>{children}</Providers>
+      <body className="min-h-full">
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );
