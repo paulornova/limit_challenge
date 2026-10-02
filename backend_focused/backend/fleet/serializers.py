@@ -25,7 +25,10 @@ class VehicleSerializer(serializers.ModelSerializer):
             "office",
             "active",
         ]
-        extra_kwargs = {"vin": {"validators": []}}
+        extra_kwargs = {
+            "vin": {"validators": []},
+            "license_plate": {"validators": []},
+        }
 
     def validate_vin(self, value):
         return value.strip().upper()

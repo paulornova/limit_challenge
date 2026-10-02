@@ -151,6 +151,23 @@ class FleetCrudApiTestCase(APITestCase):
         )
         self.assertEqual(inactive_duplicate.status_code, status.HTTP_201_CREATED)
 
+        inactive_update = self.client.patch(
+            reverse("vehicle-detail", args=[inactive_duplicate.data["id"]]),
+            {
+                "vin": inactive_duplicate.data["vin"],
+                "license_plate": inactive_duplicate.data["license_plate"],
+                "make": inactive_duplicate.data["make"],
+                "model": "Updated Civic",
+                "year": inactive_duplicate.data["year"],
+                "office": inactive_duplicate.data["office"],
+                "active": False,
+            },
+            format="json",
+        )
+        self.assertEqual(inactive_update.status_code, status.HTTP_200_OK)
+        self.assertFalse(inactive_update.data["active"])
+        self.assertEqual(inactive_update.data["model"], "Updated Civic")
+
         reactivation = self.client.patch(
             reverse("vehicle-detail", args=[inactive_duplicate.data["id"]]),
             {"active": True},
