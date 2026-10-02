@@ -8,7 +8,7 @@ export default function AppShell({ children }: PropsWithChildren) {
       <AppBar position="sticky" elevation={0}>
         <Toolbar>
           <Typography component="span" variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
-            Fleet Tracker
+            Fleemit
           </Typography>
           <Link href="/vehicles" style={{ color: 'inherit', textDecoration: 'none' }}>
             <Button color="inherit">Vehicles</Button>

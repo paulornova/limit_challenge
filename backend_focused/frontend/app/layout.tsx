@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Fleet Tracker',
+  title: 'Fleemit',
   description: 'Vehicle search for the fleet maintenance challenge',
 };
 

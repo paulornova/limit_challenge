@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Chip,
   LinearProgress,
   Paper,
@@ -11,6 +12,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import type { Vehicle } from '@/lib/vehicles';
@@ -19,9 +21,11 @@ interface VehicleTableProps {
   vehicles: Vehicle[];
   isInitialLoading: boolean;
   isRefreshing: boolean;
+  onDelete: (vehicle: Vehicle) => void;
+  onEdit: (vehicle: Vehicle) => void;
 }
 
-const columns = ['VIN', 'License plate', 'Make / model', 'Year', 'Office', 'Status'];
+const columns = ['VIN', 'License plate', 'Make / model', 'Year', 'Office', 'Status', 'Actions'];
 
 function LoadingRows() {
   return Array.from({ length: 6 }, (_, index) => (
@@ -39,6 +43,8 @@ export default function VehicleTable({
   vehicles,
   isInitialLoading,
   isRefreshing,
+  onDelete,
+  onEdit,
 }: VehicleTableProps) {
   return (
     <Paper>
@@ -77,6 +83,18 @@ export default function VehicleTable({
                       size="small"
                       variant={vehicle.active ? 'filled' : 'outlined'}
                     />
+                  </TableCell>
+                  <TableCell>
+                    <Tooltip title={`Edit ${vehicle.license_plate}`}>
+                      <Button onClick={() => onEdit(vehicle)} size="small">
+                        Edit
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title={`Delete ${vehicle.license_plate}`}>
+                      <Button color="error" onClick={() => onDelete(vehicle)} size="small">
+                        Delete
+                      </Button>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))

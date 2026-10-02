@@ -11,6 +11,26 @@ export interface Vehicle {
   active: boolean;
 }
 
+export interface Office {
+  id: number;
+  name: string;
+  city: string;
+}
+
+export interface VehicleDetail extends Omit<Vehicle, 'office'> {
+  office: Office;
+}
+
+export interface VehiclePayload {
+  vin: string;
+  license_plate: string;
+  make: string;
+  model: string;
+  year: number;
+  office: number;
+  active: boolean;
+}
+
 export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
@@ -100,4 +120,37 @@ export async function fetchVehicles(params: VehicleSearchParams) {
     params: queryParams,
   });
   return response.data;
+}
+
+export async function fetchVehicle(id: number) {
+  const response = await apiClient.get<VehicleDetail>(`/vehicles/${id}/`);
+  return response.data;
+}
+
+export async function fetchOffices() {
+  const firstResponse = await apiClient.get<PaginatedResponse<Office>>('/offices/');
+  const offices = [...firstResponse.data.results];
+  let next = firstResponse.data.next;
+
+  while (next) {
+    const response = await apiClient.get<PaginatedResponse<Office>>(next);
+    offices.push(...response.data.results);
+    next = response.data.next;
+  }
+
+  return offices;
+}
+
+export async function createVehicle(payload: VehiclePayload) {
+  const response = await apiClient.post<Vehicle>('/vehicles/', payload);
+  return response.data;
+}
+
+export async function updateVehicle(id: number, payload: VehiclePayload) {
+  const response = await apiClient.patch<Vehicle>(`/vehicles/${id}/`, payload);
+  return response.data;
+}
+
+export async function deleteVehicle(id: number) {
+  await apiClient.delete(`/vehicles/${id}/`);
 }
